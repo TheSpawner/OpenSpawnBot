@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenSpawn Bot</title>
+<style>  @font-face { font-family: 'Figtree'; src: url('fonts/figtree.woff2') format('woff2'); font-weight: 300 900; }
+  @font-face { font-family: 'JetBrains Mono'; src: url('fonts/jetbrains-mono.woff2') format('woff2'); }
+  :root {
+    --bg: #fbfbfc; --panel: #ffffff; --line: #e4e4e7; --track: #ececf0; --text: #18181b; --text-2: #3f3f46; --muted: #8a8a93;
+    --accent: #6b3fe0; --danger: #c2410c; --danger-soft: #fff4ed;
+    --font: 'Figtree', system-ui, sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0d0d10; --panel: #111114; --line: #27272a; --track: #232329; --text: #ededf0; --text-2: #c9c9d1; --muted: #7d7d88; --accent: #9b7cff; --danger: #fb923c; --danger-soft: #2a1608; }
+  }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 400 13px/20px var(--font); -webkit-font-smoothing: antialiased; }
+  main { height: 100%; display: grid; place-items: center; padding: 16px; box-sizing: border-box; }
+  .card { display: flex; flex-direction: column; align-items: center; animation: appear .5s ease-out both; }
+  @keyframes appear { from { opacity: 0; } }
+  .logo { width: 56px; height: 56px; display: block; }
+  .brand { width: min-content; margin-top: 20px; }
+  h1 { margin: 0; font-size: 26px; line-height: 32px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; text-align: center; }
+  .progress { height: 8px; margin-top: 24px; border-radius: 4px; background: var(--track); overflow: hidden; }
+  .fill { height: 100%; width: 0; border-radius: 4px; background: var(--accent); }
+  .meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; }
+  #status { flex: 1; width: 0; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity .2s; }
+  #status.swap { opacity: 0; }
+  #pct { color: var(--text-2); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .detail { min-height: 20px; margin-top: 14px; color: var(--muted); text-align: center; }
+  .pitch { position: relative; width: min(480px, 90vw); height: 20px; margin-top: 48px; color: var(--muted); text-align: center; }
+  .pitch span { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease; }
+  .pitch span.on { opacity: 1; }
+  body.leaving .card { opacity: 0; transition: opacity .25s ease; }
+
+  .error { display: none; text-align: left; margin-top: 24px; width: min(460px, 90vw); border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; }
+  .error p { margin: 0; padding: 12px 14px; background: var(--danger-soft); color: var(--danger); font-weight: 500; }
+  .error pre { margin: 0; padding: 12px 14px; max-height: 180px; overflow: auto; font: 11px/1.55 var(--mono); color: var(--muted); white-space: pre-wrap; word-break: break-word; border-top: 1px solid var(--line); }
+  .actions { display: flex; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--line); justify-content: flex-end; }
+  .actions a { font: 500 13px var(--font); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); color: var(--text); text-decoration: none; }
+  .actions a.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  body.failed .progress, body.failed #pct, body.failed .pitch, body.failed .detail { display: none; }
+  body.failed .error { display: block; }
+  @media (prefers-reduced-motion: reduce) { .card { animation: none; } .pitch span { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <img class="logo" src="logo-96.png" alt="">
+    <div class="brand">
+      <h1>OpenSpawn Bot</h1>
+      <div class="progress" role="progressbar" aria-label="Starting" aria-valuemin="0" aria-valuemax="100"><div class="fill" id="fill"></div></div>
+      <div class="meta"><span id="status">Starting…</span><span id="pct">0%</span></div>
+    </div>
+    <div class="detail" id="detail"></div>
+    <div class="pitch" id="pitch"></div>
+    <div class="error">
+      <p id="error"></p>
+      <pre id="log"></pre>
+      <div class="actions"><a href="openspawn://log">Open log</a><a class="primary" href="openspawn://retry">Try again</a></div>
+    </div>
+  </div>
+</main>
+<script>  const fill = document.getElementById('fill'), bar = document.querySelector('.progress'), pct = document.getElementById('pct'), statusEl = document.getElementById('status');
+  let target = 0.06, ceiling = 0.35, shown = 0, finished = false;
+  const creep = setInterval(() => { if (target < ceiling) target += (ceiling - target) * 0.03; }, 250);
+  (function frame() {
+    shown += (target - shown) * (finished ? 0.2 : 0.08);
+    if (Math.abs(target - shown) < 0.001) shown = target;
+    const p = Math.min(100, Math.round(shown * 100));
+    fill.style.width = (shown * 100).toFixed(2) + '%';
+    pct.textContent = p + '%';
+    bar.setAttribute('aria-valuenow', p);
+    if (!(finished && shown >= 1)) requestAnimationFrame(frame);
+  })();
+  window.setProgress = (value, next) => {
+    target = Math.max(target, value); ceiling = Math.max(ceiling, next ?? Math.min(0.92, value + 0.3));
+    if (value >= 1) { finished = true; clearInterval(creep); setStatus('Ready'); setTimeout(() => document.body.classList.add('leaving'), 550); }
+  };
+  window.setStatus = text => {
+    if (statusEl.textContent === text) return;
+    statusEl.classList.add('swap');
+    setTimeout(() => { statusEl.textContent = text; statusEl.classList.remove('swap'); }, 180);
+  };
+  window.setDetail = text => { document.getElementById('detail').textContent = text || ''; };
+  window.showError = (message, log) => {
+    clearInterval(creep); clearInterval(rotate);
+    document.body.classList.add('failed');
+    statusEl.textContent = 'Could not start';
+    document.getElementById('error').textContent = message;
+    document.getElementById('log').textContent = log || '(the engine wrote nothing)';
+  };
+
+  const PITCH = [
+    'Knows nothing. Looks everything up.',
+    'Every answer cross-checked across independent sites.',
+    'Every sentence fact-checked before you read it.',
+    'Live weather, prices and news. Exact maths.',
+    'Browses in its own window, never in your profile.',
+    'A 0.8B model running on your own computer.',
+    'Over 100 tools for files, the web, maps and money.'
+  ];
+  const pitch = document.getElementById('pitch');
+  pitch.innerHTML = PITCH.map(t => `<span>${t}</span>`).join('');
+  const lines = [...pitch.children];
+  let at = 0;
+  lines[0].classList.add('on');
+  const rotate = setInterval(() => { lines[at].classList.remove('on'); at = (at + 1) % lines.length; lines[at].classList.add('on'); }, 3200);
+</script>
+</body>
+</html>

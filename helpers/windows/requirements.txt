@@ -1,0 +1,4 @@
+pywinauto==0.6.9
+pywin32==311
+psutil==7.0.0
+comtypes==1.4.17

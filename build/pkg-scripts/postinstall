@@ -1,0 +1,21 @@
+#!/bin/bash
+set -uo pipefail
+
+APP="/Applications/OpenSpawn Bot.app"
+SCRIPTS_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+log() { echo "[OpenSpawn Bot] $*"; }
+
+if [ -d "$APP" ]; then
+  xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
+fi
+
+if [ -f "$SCRIPTS_DIR/openspawn-bot-uninstall" ]; then
+  mkdir -p /usr/local/bin
+  cp "$SCRIPTS_DIR/openspawn-bot-uninstall" /usr/local/bin/openspawn-bot-uninstall
+  chmod 755 /usr/local/bin/openspawn-bot-uninstall
+  log "Installed the uninstaller: sudo openspawn-bot-uninstall"
+fi
+
+log "Installation complete"
+exit 0

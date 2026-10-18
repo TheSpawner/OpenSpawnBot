@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenSpawn Bot</title>
+<link rel="icon" href="favicon.ico">
+<link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="rail" id="rail">
+    <div class="rail-head">
+      <button class="new-chat" id="newChat" title="New chat (Ctrl N)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>New chat</span><kbd>Ctrl N</kbd></button>
+      <button class="btn-icon ghost" id="collapse" title="Collapse sidebar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    </div>
+    <div class="rail-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="threadSearch" placeholder="Search chats" spellcheck="false"></div>
+    <div class="rail-label rail-label-row"><span>Chats</span><button class="clear-all" id="clearAll" data-clear-all hidden>Clear all</button></div>
+    <nav class="threads" id="threads"></nav>
+    <div class="rail-label">Workspace</div>
+    <nav class="rail-nav">
+      <button data-view="tools"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg>Tools<span class="count" id="toolCount"></span></button>
+      <button data-view="trust"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/></svg>Source trust</button>
+      <button data-view="about"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Architecture</button>
+      <button id="openSettings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
+    </nav>
+    <div class="system" id="system"></div>
+  </aside>
+
+  <section class="workspace">
+    <header class="topbar">
+      <button class="btn-icon ghost expand" id="expand" title="Show sidebar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+      <div class="brand-top"><b>OpenSpawn Bot</b></div>
+      <div class="top-right">
+        <div class="pill" id="modelPill"></div>
+        <button class="btn-icon ghost" id="toggleInspector" title="Inspector (Ctrl I)"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button>
+      </div>
+    </header>
+    <div class="panes">
+      <main class="stage">
+        <div class="scroller" id="view"></div>
+        <footer class="composer-wrap" id="composerWrap">
+          <form class="composer" id="composer">
+            <textarea id="input" rows="1" placeholder="Ask anything, or tell it what to do on your computer…" autocomplete="off"></textarea>
+            <div class="composer-bar">
+              <span class="hint" style="margin-left:0;flex:1"><kbd>Enter</kbd> send <kbd>Shift Enter</kbd> new line <kbd>Esc</kbd> stop</span>
+              <button type="submit" class="send" id="send" title="Send"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+              <button type="button" class="stop" id="stop" title="Stop" hidden><svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>Stop</button>
+            </div>
+          </form>
+        </footer>
+      </main>
+      <aside class="inspector" id="inspector"></aside>
+    </div>
+  </section>
+</div>
+<div class="popover" id="popover" hidden></div>
+<dialog class="modal" id="settings"></dialog>
+<div class="toast" id="toast" hidden></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>

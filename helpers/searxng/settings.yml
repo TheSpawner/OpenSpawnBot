@@ -1,0 +1,50 @@
+use_default_settings: true
+general:
+  instance_name: "OpenSpawn Bot search"
+  debug: false
+server:
+  secret_key: "SECRET"
+  bind_address: "127.0.0.1"
+  port: 8888
+  limiter: false
+  public_instance: false
+  image_proxy: false
+search:
+  safe_search: 0
+  autocomplete: ""
+  formats:
+    - html
+    - json
+  suspended_times:
+    SearxEngineAccessDenied: 900
+    SearxEngineCaptcha: 900
+    SearxEngineTooManyRequests: 300
+    cf_SearxEngineCaptcha: 900
+    cf_SearxEngineAccessDenied: 900
+    recaptcha_SearxEngineCaptcha: 900
+outgoing:
+  request_timeout: 4.0
+  max_request_timeout: 7.0
+ui:
+  static_use_hash: false
+engines:
+  - name: bing
+    disabled: false
+  - name: google
+    disabled: false
+  - name: mojeek
+    disabled: false
+  - name: qwant
+    disabled: false
+  - name: yahoo
+    disabled: false
+  - name: yep
+    disabled: false
+  - name: mwmbl
+    disabled: false
+  - name: duckduckgo
+    disabled: false
+  - name: brave
+    disabled: false
+  - name: wikipedia
+    disabled: false

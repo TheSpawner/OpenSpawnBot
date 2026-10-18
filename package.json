@@ -1,0 +1,201 @@
+{
+  "name": "openspawn-bot",
+  "productName": "OpenSpawn Bot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A tiny language model that knows nothing and looks everything up.",
+  "author": "OpenSpawn",
+  "homepage": "https://github.com/TheSpawner/OpenSpawnBot",
+  "scripts": {
+    "start": "node desktop/launch.mjs",
+    "engine": "node engine/server.mjs",
+    "dist:win": "electron-builder --win --x64",
+    "build:helper": "node scripts/build-helper.mjs",
+    "dist:mac:intel": "npm ci --os=darwin --cpu=x64 && electron-builder --mac pkg --x64 -c.mac.artifactName=OpenSpawn-Bot-Installer-Intel.\\${ext}",
+    "dist:mac:silicon": "npm ci --os=darwin --cpu=arm64 && electron-builder --mac pkg --arm64 -c.mac.artifactName=OpenSpawn-Bot-Installer-AppleSilicon.\\${ext}",
+    "dist:linux": "npm ci --os=linux --cpu=x64 --libc=glibc && electron-builder --linux dir --x64 && node scripts/build-linux-installer.mjs",
+    "dist:linux:deb": "npm ci --os=linux --cpu=x64 --libc=glibc && electron-builder --linux deb --x64"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "4.3.1",
+    "@mozilla/readability": "0.6.0",
+    "adm-zip": "0.5.16",
+    "linkedom": "0.18.13",
+    "mathjs": "15.2.0",
+    "pdf-lib": "1.17.1"
+  },
+  "main": "desktop/main.cjs",
+  "devDependencies": {
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "ai.openspawn.bot",
+    "productName": "OpenSpawn Bot",
+    "copyright": "OpenSpawn",
+    "electronVersion": "44.3.0",
+    "asar": false,
+    "compression": "maximum",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "executableName": "OpenSpawn Bot",
+      "artifactName": "OpenSpawn-Bot-Installer.${ext}",
+      "requestedExecutionLevel": "asInvoker",
+      "files": [
+        "desktop/**",
+        "engine/**",
+        "ui/**",
+        "helpers/**",
+        "package.json",
+        "!**/*.map",
+        "!**/__pycache__/**",
+        "!node_modules/onnxruntime-web/**",
+        "!node_modules/onnxruntime-node/bin/napi-v6/darwin/**",
+        "!node_modules/onnxruntime-node/bin/napi-v6/linux/**",
+        "!node_modules/onnxruntime-node/bin/napi-v6/win32/arm64/**",
+        "!helpers/macos/**",
+        "!helpers/linux/**"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "OpenSpawn Bot",
+      "runAfterFinish": false,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerSidebar": "build/installerSidebar.bmp",
+      "uninstallerSidebar": "build/installerSidebar.bmp",
+      "include": "build/installer.nsh",
+      "uninstallDisplayName": "OpenSpawn Bot",
+      "artifactName": "OpenSpawn-Bot-Installer.${ext}"
+    },
+    "electronLanguages": [
+      "en-US"
+    ],
+    "afterPack": "scripts/after-pack.cjs",
+    "mac": {
+      "target": [
+        {
+          "target": "pkg",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.productivity",
+      "identity": "OpenSpawn",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "notarize": false,
+      "darkModeSupport": true,
+      "artifactName": "OpenSpawn-Bot-Installer-Intel.${ext}",
+      "files": [
+        "desktop/**",
+        "engine/**",
+        "ui/**",
+        "helpers/**",
+        "package.json",
+        "!**/*.map",
+        "!**/__pycache__/**",
+        "!node_modules/onnxruntime-web/**",
+        "!node_modules/onnxruntime-node/bin/napi-v6/win32/**",
+        "!node_modules/onnxruntime-node/bin/napi-v6/linux/**",
+        "!helpers/windows/**",
+        "!helpers/linux/**",
+        "!helpers/searxng/windows/**"
+      ],
+      "timestamp": "none"
+    },
+    "pkg": {
+      "scripts": "pkg-scripts",
+      "installLocation": "/Applications",
+      "isRelocatable": false,
+      "overwriteAction": "upgrade",
+      "identity": null
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icons",
+      "executableName": "openspawn-bot",
+      "artifactName": "OpenSpawn-Bot-Installer.${ext}",
+      "category": "Utility",
+      "synopsis": "A tiny language model that knows nothing and looks everything up.",
+      "description": "A tiny language model that knows nothing and looks everything up.",
+      "desktop": {
+        "entry": {
+          "StartupWMClass": "OpenSpawn Bot"
+        }
+      },
+      "files": [
+        "desktop/**",
+        "engine/**",
+        "ui/**",
+        "helpers/**",
+        "package.json",
+        "!**/*.map",
+        "!**/__pycache__/**",
+        "!node_modules/onnxruntime-web/**",
+        "!node_modules/onnxruntime-node/bin/napi-v6/win32/**",
+        "!node_modules/onnxruntime-node/bin/napi-v6/darwin/**",
+        "!node_modules/onnxruntime-node/bin/napi-v6/linux/*/libonnxruntime_providers_*",
+        "!helpers/windows/**",
+        "!helpers/macos/**",
+        "!helpers/searxng/windows/**"
+      ]
+    },
+    "deb": {
+      "maintainer": "OpenSpawn <contact@openspawn.app>",
+      "packageName": "openspawn-bot",
+      "packageCategory": "utils",
+      "priority": "optional",
+      "afterInstall": "build/linux/after-install.sh",
+      "afterRemove": "build/linux/after-remove.sh",
+      "depends": [
+        "libgtk-3-0 | libgtk-3-0t64",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0 | libatspi2.0-0t64",
+        "libuuid1",
+        "libsecret-1-0",
+        "python3",
+        "tar"
+      ],
+      "recommends": [
+        "libvulkan1",
+        "wtype",
+        "grim"
+      ],
+      "fpm": [
+        "build/linux/openspawn-bot-uninstall=/usr/bin/openspawn-bot-uninstall"
+      ]
+    }
+  }
+}
